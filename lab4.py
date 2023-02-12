@@ -1,29 +1,33 @@
 from log_anaylis import get_log_file_path_from_cmd_line, filter_log_by_regex
+import pandas as pd
+
 def main():
     log_file = get_log_file_path_from_cmd_line(1)
-    records = filter_log_by_regex(log_file, 'SRC=(.*?) DST=(.*?) LEN=(.*?) ', print_summary= True,print_records=True)
     port_traffic = tally_port_traffic(log_file)
-   
+
+    for port_num, count in port_traffic.items():
+        if count >= 100:
+            generate_port_traffic_report(log_file, port_num)
+
     pass
 
 # TODO: Step 8
 def tally_port_traffic(log_file):
-   data = filter_log_by_regex(log_file, r'DPT = (.+?)')[1]
-   port_tarffic = {}
-   for d in data:
-       port= [0]
-       port_tarffic[port] = port_tarffic.get(port,0) + 1
-   
-   return port_tarffic
+    data = filter_log_by_regex(log_file, r'DPT=(.+?) ')[1]
+    port_traffic = {}
+    for d in data:
+        port = d[0]
+        port_traffic[port] = port_traffic.get(port, 0) + 1
+    return port_traffic
 
 # TODO: Step 9
 def generate_port_traffic_report(log_file, port_number):
-    regex = r'({6}) (.{8}0)    r
-    ecords, data = filter_log_by_regex(log_file, 'SRC=(.*?) DST=(.*?) LEN=(.*?) ', print_summary= True,print_records=True)
-    
-    
-    
-    
+    regex = r'(.{6}) (.{8}) .*SRC=(.+) DST(.+?) .+SPT=(.+)' + f'DPT=({port_number}) '
+    data = filter_log_by_regex(log_file, regex)[1]
+
+    report_df = pd.DataFrame(data)
+    header_row = ('Date', 'Time', 'Source IP Address', 'Destination IP Address', 'Source Port', 'Destination Port')
+    report_df.to_csv(f'destination_port_{port_number}_report.csv', index=False, header=header_row)
     return
 
 # TODO: Step 11
