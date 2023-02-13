@@ -9,9 +9,9 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "console": "integratedTerminal",
+            "console": "externalTerminal",
             "justMyCode": true,
-            "args" : ["gateway.log"]
+            "args" : ["logfile.log"]
         }
     ]
 }

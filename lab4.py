@@ -36,19 +36,23 @@ def generate_port_traffic_report(log_file, port_number):
 
 # TODO: Step 11
 def generate_invalid_user_report(log_file):
-    regex = r'(.{6}) (.{8}) .*Failed password for invalid user (\w+) from (.+)'
+    regex = r'(.{6}) (.{8}) .*invalid user (.+) from (.+)'
     data = filter_log_by_regex(log_file, regex)[1]
 
-    report_df = pd.DataFrame(data, columns=('Date', 'Time', 'Username', 'IP Address'))
-    report_df.to_csv('invalid_users.csv', index=False)
+    report_df = pd.DataFrame(data)
+    header_row = ('Date', 'Time', 'Username', 'IP Address')
+    report_df.to_csv(f'invalid_users.csv', index=False, header=header_row)
+    return
+
 # TODO: Step 12
 def generate_source_ip_log(log_file, ip_address):
-  regex = r'(.{6}) (.{8}) .*SRC=(.+) .*' + f'SRC={ip_address} '
-  data = filter_log_by_regex(log_file, regex)
-  with open(f'source_ip_{ip_address.replace(".", "_")}.log', 'w') as file:
-        for line in data[0]:
-            file.write(line)
+   regex = rf'(.+?) .*SRC=({ip_address})'
+   data = filter_log_by_regex(log_file, regex)[0]
 
+   file_name = f'source_ip_{ip_address.replace(".", "_")}.log'
+   with open(file_name, 'w') as f:
+       f.write('\n'.join(data))
+   return
 if __name__ == '__main__':
     main()
     
